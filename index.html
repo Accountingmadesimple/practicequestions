@@ -4,88 +4,806 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accountancy Quiz</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --gray-light: #f3f4f6;
+            --gray: #9ca3af;
+            --gray-dark: #4b5563;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --white: #ffffff;
+            --red: #ef4444;
+            --green: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--gray-light);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+        
+        .topic-selector {
+            margin-bottom: 2rem;
+        }
+        
+        .select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--gray);
+            border-radius: 6px;
+            background-color: var(--white);
+            color: var(--text);
+            font-size: 1rem;
+            cursor: pointer;
+            appearance: none;
+        }
+        
+        .select-wrapper::after {
+            content: "▼";
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-dark);
+            pointer-events: none;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        button:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+        }
+        
+        .pro-badge {
+            background-color: var(--red);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        
+        .quiz-container {
+            display: none;
+        }
+        
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        
+        .quiz-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .quiz-progress {
+            font-size: 1rem;
+            color: var(--text-light);
+        }
+        
+        .question-container {
+            margin-bottom: 2rem;
+        }
+        
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .options {
+            display: grid;
+            gap: 0.75rem;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--gray);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .option:hover {
+            background-color: var(--gray-light);
+        }
+        
+        .option.selected {
+            border-color: var(--primary);
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+        
+        .option-prefix {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--gray-light);
+            border-radius: 50%;
+            margin-right: 1rem;
+            font-weight: 600;
+        }
+        
+        .selected .option-prefix {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .option-text {
+            flex: 1;
+        }
+        
+        .quiz-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+        
+        .back-btn {
+            background-color: var(--gray-light);
+            color: var(--text);
+        }
+        
+        .back-btn:hover {
+            background-color: var(--gray);
+        }
+        
+        .results-container {
+            display: none;
+            text-align: center;
+        }
+        
+        .results-header {
+            margin-bottom: 2rem;
+        }
+        
+        .results-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .results-subtitle {
+            color: var(--text-light);
+        }
+        
+        .score {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 1.5rem 0;
+        }
+        
+        .score-text {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .restart-btn {
+            background-color: var(--gray-light);
+            color: var(--text);
+        }
+        
+        .pro-tooltip {
+            position: fixed;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Blurred pro options */
+        .pro-option {
+            filter: blur(1px);
+            opacity: 0.7;
+            position: relative;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav>
-        <a href="https://accountancyquiz.github.io/homepage/" class="return-home-btn">Return to Homepage</a>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="container">
-        <h1>Accountancy Quiz</h1>
+    <div class="container">
+        <header>
+            <h1>Accountancy Quiz Challenge</h1>
+            <p class="description">Test your accounting knowledge with our practice questions</p>
+        </header>
         
-        <!-- Quiz Controls -->
-        <section class="quiz-controls">
-            <select class="topic-select" id="topicSelect">
-                <option value="">Select a Topic</option>
-                <option value="Financial Accounting">Financial Accounting</option>
-                <option value="Management Accounting">Management Accounting</option>
-                <option value="Auditing">Auditing</option>
-            </select>
-
-            <div class="progress-container" id="progressContainer" style="display: none;">
-                <div class="progress-text" id="progressText">Questions Answered: 0/5</div>
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-        </section>
-
-        <!-- Quiz Content -->
-        <section id="quizContainer" class="quiz-container" style="display: none;"></section>
-
-        <!-- Donation Section -->
-        <section id="donate" class="donate-section">
-            <h2 class="donation-title">Support financial education and empower future accountants!</h2>
+        <div id="topic-selector" class="topic-selector">
+            <h2>Select an Accountancy Topic</h2>
+            <p class="description">Choose a topic to start your 10-question quiz session</p>
             
-            <div class="donation-image-container">
-                <img src="https://example.com/accounting-image.jpg"
-                     alt="Accountancy education"
-                     class="donation-image"
-                     loading="lazy">
+            <div class="select-wrapper">
+                <select id="topic-dropdown">
+                    <option value="" disabled selected>Select a topic...</option>
+                    <option value="financial">Financial Accounting</option>
+                    <option value="management">Management Accounting</option>
+                    <option value="auditing">Auditing</option>
+                    <option value="taxation" class="pro-option">Taxation</option>
+                    <option value="corporate" class="pro-option">Corporate Finance</option>
+                    <option value="ethics" class="pro-option">Accounting Ethics</option>
+                    <option value="ifrs" class="pro-option">IFRS Standards</option>
+                    <option value="forensic" class="pro-option">Forensic Accounting</option>
+                </select>
             </div>
             
-            <p class="donation-description">
-                Many aspiring accountants lack access to quality resources. Help us provide free tools and education to empower their success.
-            </p>
-        </section>
-    </main>
-
-    <!-- Fixed Elements -->
-    <div class="donate-banner">
-        <a href="https://accountancydonations.github.io/donate/" target="_blank" rel="noopener noreferrer">
-            PLEASE CLICK HERE TO DONATE
-        </a>
-    </div>
-
-    <!-- Telegram Popup -->
-    <div class="telegram-popup" id="telegramPopup" style="display: none;">
-        <div class="popup-content">
-            <span class="close-btn" onclick="closePopup()">&times;</span>
-            
-            <div class="popup-header">
-                <img src="https://logos-world.net/wp-content/uploads/2021/03/Telegram-Symbol.png" 
-                     alt="Telegram Logo" 
-                     class="telegram-logo">
-                <h2>🚨 Limited Time Access! 🚨</h2>
+            <button id="start-quiz" disabled>Start Quiz</button>
+        </div>
+        
+        <div id="quiz-container" class="quiz-container">
+            <div class="quiz-header">
+                <div class="quiz-title" id="quiz-title">Financial Accounting Quiz</div>
+                <div class="quiz-progress">Question <span id="current-question">1</span> of <span id="total-questions">10</span></div>
             </div>
-
-            <div class="popup-body">
-                <p class="urgent-msg">⚠️ Our Telegram group is closing in less than 24 hours!</p>
-                <p>Join our exclusive Telegram channel to access:</p>
-                <ul>
-                    <li>📚 Free Video Lectures</li>
-                    <li>📝 Study Materials</li>
-                    <li>👥 Community Support</li>
-                    <li>🎯 Practice Problems</li>
-                </ul>
-                <a href="https://t.me/accountancy101" class="join-btn" target="_blank">
-                    Join Now Before It's Too Late!
-                </a>
+            
+            <div class="question-container">
+                <div id="question" class="question">Loading question...</div>
+                <div id="options" class="options">
+                    <!-- Options will be inserted here by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="quiz-navigation">
+                <button id="back-btn" class="back-btn">Back to Topics</button>
+                <button id="next-btn">Next Question</button>
+            </div>
+        </div>
+        
+        <div id="results-container" class="results-container">
+            <div class="results-header">
+                <div class="results-title">Quiz Complete!</div>
+                <div class="results-subtitle" id="results-topic">Financial Accounting Quiz</div>
+            </div>
+            
+            <div class="score" id="score">7/10</div>
+            <div class="score-text" id="score-text">Great job! You scored 70%</div>
+            
+            <div class="actions">
+                <button id="restart-btn" class="restart-btn">Try Another Topic</button>
+                <button id="retry-btn">Retry This Topic</button>
             </div>
         </div>
     </div>
-
-    <script src="script.js"></script>
+    
+    <div id="pro-tooltip" class="pro-tooltip">UPGRADE TO PRO</div>
+    
+    <script>
+        // DOM Elements
+        const topicSelector = document.getElementById('topic-selector');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsContainer = document.getElementById('results-container');
+        const topicDropdown = document.getElementById('topic-dropdown');
+        const startQuizBtn = document.getElementById('start-quiz');
+        const backBtn = document.getElementById('back-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const retryBtn = document.getElementById('retry-btn');
+        const quizTitle = document.getElementById('quiz-title');
+        const currentQuestionSpan = document.getElementById('current-question');
+        const totalQuestionsSpan = document.getElementById('total-questions');
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const resultsTopic = document.getElementById('results-topic');
+        const scoreElement = document.getElementById('score');
+        const scoreTextElement = document.getElementById('score-text');
+        const proTooltip = document.getElementById('pro-tooltip');
+        
+        // Quiz state
+        let currentTopic = '';
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedAnswers = [];
+        
+        // Question banks for each topic
+        const questionBanks = {
+            financial: [
+                {
+                    question: "Which financial statement shows the financial position of a company at a specific point in time?",
+                    options: ["Income Statement", "Balance Sheet", "Cash Flow Statement", "Statement of Changes in Equity"],
+                    answer: 1
+                },
+                {
+                    question: "The accounting equation states that:",
+                    options: ["Assets = Liabilities - Equity", "Assets = Liabilities + Equity", "Assets + Liabilities = Equity", "Equity = Assets + Liabilities"],
+                    answer: 1
+                },
+                {
+                    question: "Which of the following is considered a current asset?",
+                    options: ["Land", "Buildings", "Accounts Receivable", "Equipment"],
+                    answer: 2
+                },
+                {
+                    question: "When a company purchases inventory on credit, which accounts are affected?",
+                    options: ["Increase Inventory, Increase Cash", "Increase Inventory, Increase Accounts Payable", "Increase Inventory, Decrease Accounts Payable", "Decrease Cash, Increase Inventory"],
+                    answer: 1
+                },
+                {
+                    question: "The process of transferring journal entries to the ledger accounts is called:",
+                    options: ["Journalizing", "Posting", "Balancing", "Adjusting"],
+                    answer: 1
+                },
+                {
+                    question: "Which accounting principle states that revenue should be recognized when it is earned, regardless of when cash is received?",
+                    options: ["Matching Principle", "Revenue Recognition Principle", "Cost Principle", "Going Concern Principle"],
+                    answer: 1
+                },
+                {
+                    question: "What is the correct journal entry for paying rent expense?",
+                    options: ["Dr. Rent Expense, Cr. Accounts Payable", "Dr. Rent Expense, Cr. Cash", "Dr. Cash, Cr. Rent Expense", "Dr. Rent Payable, Cr. Cash"],
+                    answer: 1
+                },
+                {
+                    question: "A company purchased a delivery truck for $50,000 with an estimated useful life of 5 years and no salvage value. Using straight-line depreciation, what is the annual depreciation expense?",
+                    options: ["$5,000", "$10,000", "$12,500", "$25,000"],
+                    answer: 1
+                },
+                {
+                    question: "Which of the following items would NOT appear on a company's balance sheet?",
+                    options: ["Accounts Receivable", "Revenue", "Long-term Investments", "Retained Earnings"],
+                    answer: 1
+                },
+                {
+                    question: "The concept that financial statements should include all information that would affect a user's decision is known as:",
+                    options: ["Reliability", "Materiality", "Comparability", "Consistency"],
+                    answer: 1
+                },
+                {
+                    question: "Which inventory valuation method assumes that the latest inventory purchased is the first to be sold?",
+                    options: ["FIFO (First-In, First-Out)", "LIFO (Last-In, First-Out)", "Weighted Average", "Specific Identification"],
+                    answer: 1
+                },
+                {
+                    question: "Accrued expenses are:",
+                    options: ["Expenses that have been paid but not yet incurred", "Expenses that have been incurred but not yet paid", "Expenses that have been both incurred and paid", "Expenses that will be incurred in the future"],
+                    answer: 1
+                },
+                {
+                    question: "Which financial statement shows the results of operations for a period of time?",
+                    options: ["Balance Sheet", "Income Statement", "Statement of Cash Flows", "Statement of Retained Earnings"],
+                    answer: 1
+                },
+                {
+                    question: "The matching principle states that:",
+                    options: ["Assets should match liabilities", "Expenses should be recognized in the same period as related revenues", "Debits should match credits", "Revenue should match cash received"],
+                    answer: 1
+                },
+                {
+                    question: "A trial balance is prepared to check that:",
+                    options: ["All journal entries have been recorded", "All ledger accounts have zero balances", "The total of debit balances equals the total of credit balances", "All transactions have been authorized"],
+                    answer: 2
+                }
+            ],
+            management: [
+                {
+                    question: "Which of the following is NOT a characteristic of management accounting?",
+                    options: ["Forward-looking", "Compliance with GAAP or IFRS", "Focus on internal decision-making", "Tailored to management needs"],
+                    answer: 1
+                },
+                {
+                    question: "Break-even analysis is concerned with finding the point where:",
+                    options: ["Revenue equals profit", "Fixed costs equal variable costs", "Total costs equal total revenue", "Marginal cost equals marginal revenue"],
+                    answer: 2
+                },
+                {
+                    question: "Which costing method assigns overhead costs to products based on activities that drive costs?",
+                    options: ["Job Costing", "Process Costing", "Activity-Based Costing", "Variable Costing"],
+                    answer: 2
+                },
+                {
+                    question: "In a contribution margin income statement, what is the formula for contribution margin?",
+                    options: ["Sales - Total Costs", "Sales - Fixed Costs", "Sales - Variable Costs", "Sales - Operating Expenses"],
+                    answer: 2
+                },
+                {
+                    question: "Which of the following is a fixed cost?",
+                    options: ["Direct materials", "Direct labor in a variable pay environment", "Sales commissions", "Rent for factory building"],
+                    answer: 3
+                },
+                {
+                    question: "The difference between budgeted and actual results is called:",
+                    options: ["Reconciliation", "Variance", "Discrepancy", "Adjustment"],
+                    answer: 1
+                },
+                {
+                    question: "Which budgeting approach starts from zero and requires justification for all expenditures?",
+                    options: ["Incremental Budgeting", "Flexible Budgeting", "Zero-Based Budgeting", "Rolling Budgeting"],
+                    answer: 2
+                },
+                {
+                    question: "Return on Investment (ROI) is calculated as:",
+                    options: ["Net Income ÷ Total Assets", "Net Income ÷ Sales", "Gross Profit ÷ Total Assets", "Operating Income ÷ Sales"],
+                    answer: 0
+                },
+                {
+                    question: "A favorable cost variance occurs when:",
+                    options: ["Actual costs are higher than standard costs", "Actual costs are equal to standard costs", "Actual costs are lower than standard costs", "Standard costs are adjusted upward"],
+                    answer: 2
+                },
+                {
+                    question: "Which of the following is NOT considered a responsibility center?",
+                    options: ["Cost Center", "Profit Center", "Investment Center", "Activity Center"],
+                    answer: 3
+                },
+                {
+                    question: "The concept of relevant costs in decision-making refers to costs that:",
+                    options: ["Have already been incurred", "Will differ between alternatives", "Are recorded in the accounting system", "Are allocated to products"],
+                    answer: 1
+                },
+                {
+                    question: "Which of the following is a limitation of the payback period capital budgeting method?",
+                    options: ["It considers the time value of money", "It considers cash flows after the payback period", "It is easy to calculate", "It focuses on liquidity"],
+                    answer: 1
+                },
+                {
+                    question: "Target costing is a method that starts with:",
+                    options: ["Determining the cost to produce a product", "Setting a desired profit margin", "Determining the market price customers will pay", "Analyzing competitor costs"],
+                    answer: 2
+                },
+                {
+                    question: "The Balanced Scorecard approach to performance measurement includes which of the following perspectives?",
+                    options: ["Financial, Customer, Internal Business Process, Learning and Growth", "Financial, Operational, Strategic, Tactical", "Planning, Organizing, Leading, Controlling", "Short-term, Medium-term, Long-term, Continuous"],
+                    answer: 0
+                },
+                {
+                    question: "Opportunity cost is best defined as:",
+                    options: ["The cost of materials used in production", "The difference between actual and standard costs", "The benefit foregone by choosing one alternative over another", "The cost that varies with the level of production"],
+                    answer: 2
+                }
+            ],
+            auditing: [
+                {
+                    question: "Which of the following best describes the primary purpose of an external audit?",
+                    options: ["To detect all fraud within a company", "To improve the efficiency of operations", "To express an opinion on the financial statements", "To ensure compliance with all laws and regulations"],
+                    answer: 2
+                },
+                {
+                    question: "Audit risk is composed of which three components?",
+                    options: ["Inherent risk, Control risk, and Detection risk", "Business risk, Financial risk, and Legal risk", "Planning risk, Execution risk, and Reporting risk", "Sampling risk, Non-sampling risk, and Engagement risk"],
+                    answer: 0
+                },
+                {
+                    question: "Which of the following is NOT one of the fundamental principles in the IESBA Code of Ethics for Professional Accountants?",
+                    options: ["Integrity", "Objectivity", "Proficiency", "Confidentiality"],
+                    answer: 2
+                },
+                {
+                    question: "The concept of materiality in auditing refers to:",
+                    options: ["The size of the audit firm", "The cost of performing audit procedures", "The significance of a misstatement that could influence decisions of users", "The amount of evidence required for each assertion"],
+                    answer: 2
+                },
+                {
+                    question: "Which of the following would most likely impair an auditor's independence?",
+                    options: ["Providing tax preparation services to an audit client", "Having a direct financial interest in the audit client", "Recommending adjusting entries to the financial statements", "Communicating significant deficiencies in internal control"],
+                    answer: 1
+                },
+                {
+                    question: "Which audit procedure would be most appropriate to verify the existence of inventory?",
+                    options: ["Confirming inventory amounts with third parties", "Reviewing purchase invoices for inventory items", "Observing the physical inventory count", "Analyzing the inventory turnover ratio"],
+                    answer: 2
+                },
+                {
+                    question: "An auditor's report that contains an unmodified opinion indicates that:",
+                    options: ["The financial statements are completely free of errors", "No fraud was detected during the audit", "The financial statements are fairly presented in all material respects", "The company has strong internal controls"],
+                    answer: 2
+                },
+                {
+                    question: "Which of the following is NOT a type of audit evidence?",
+                    options: ["Inspection", "Observation", "External confirmation", "Management representation"],
+                    answer: 3
+                },
+                {
+                    question: "Audit sampling is used because:",
+                    options: ["It is required by auditing standards", "It always provides better evidence than testing 100% of items", "It is more cost-effective than testing all transactions", "It eliminates the risk of making incorrect conclusions"],
+                    answer: 2
+                },
+                {
+                    question: "Which of the following best describes the purpose of a walkthrough in assessing internal control?",
+                    options: ["To identify all internal control deficiencies", "To trace selected transactions through the accounting system", "To verify compliance with company policies", "To determine if management override has occurred"],
+                    answer: 1
+                },
+                {
+                    question: "In relation to auditing, what is the purpose of an engagement letter?",
+                    options: ["To provide the audit opinion to management", "To outline the responsibilities of both the auditor and client", "To document internal control weaknesses", "To authorize the start of fieldwork"],
+                    answer: 1
+                },
+                {
+                    question: "Which of the following is NOT typically included in audit working papers?",
+                    options: ["Audit planning memoranda", "Analysis of significant account balances", "Copies of client records", "Evidence of supervisory review"],
+                    answer: 2
+                },
+                {
+                    question: "What is the auditor's primary responsibility regarding the discovery of fraud?",
+                    options: ["To detect all fraud, regardless of materiality", "To prevent fraud before it occurs", "To obtain reasonable assurance that financial statements are free from material misstatement due to fraud", "To report all instances of fraud to regulatory authorities"],
+                    answer: 2
+                },
+                {
+                    question: "Which of the following would be considered a test of control rather than a substantive test?",
+                    options: ["Confirming accounts receivable balances with customers", "Observing segregation of duties for cash handling", "Recalculating depreciation expense", "Analyzing unusual fluctuations in expense accounts"],
+                    answer: 1
+                },
+                {
+                    question: "Which of the following best describes the concept of professional skepticism as applied to auditing?",
+                    options: ["Assuming management is dishonest until proven otherwise", "Questioning mind and critical assessment of audit evidence", "Maintaining a negative attitude throughout the audit", "Automatically disbelieving all client explanations"],
+                    answer: 1
+                }
+            ]
+        };
+        
+        // Initialize the quiz
+        function init() {
+            // Enable/disable start button based on topic selection
+            topicDropdown.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                currentTopic = this.value;
+                
+                if (currentTopic && !selectedOption.classList.contains('pro-option')) {
+                    startQuizBtn.disabled = false;
+                } else {
+                    startQuizBtn.disabled = true;
+                }
+            });
+            
+            // Handle PRO option selection
+            topicDropdown.addEventListener('mousedown', function(event) {
+                const select = this;
+                setTimeout(function() {
+                    const selectedOption = select.options[select.selectedIndex];
+                    if (selectedOption && selectedOption.classList.contains('pro-option')) {
+                        showProTooltip(event);
+                        // Reset selection to previous or empty
+                        select.value = currentTopic || "";
+                    }
+                }, 100);
+            });
+            
+            // Start quiz button click handler
+            startQuizBtn.addEventListener('click', startQuiz);
+            
+            // Back button click handler
+            backBtn.addEventListener('click', function() {
+                showTopicSelector();
+            });
+            
+            // Next button click handler
+            nextBtn.addEventListener('click', goToNextQuestion);
+            
+            // Restart button click handler
+            restartBtn.addEventListener('click', function() {
+                showTopicSelector();
+            });
+            
+            // Retry button click handler
+            retryBtn.addEventListener('click', function() {
+                startQuiz();
+            });
+        }
+        
+        // Start the quiz with the selected topic
+        function startQuiz() {
+            // Reset quiz state
+            currentQuestionIndex = 0;
+            score = 0;
+            selectedAnswers = Array(10).fill(null);
+            
+            // Get 10 random questions for the selected topic
+            questions = getRandomQuestions(questionBanks[currentTopic], 10);
+            
+            // Update UI
+            quizTitle.textContent = getTopicName(currentTopic) + " Quiz";
+            totalQuestionsSpan.textContent = questions.length;
+            
+            // Show the quiz container
+            topicSelector.style.display = 'none';
+            quizContainer.style.display = 'block';
+            resultsContainer.style.display = 'none';
+            
+            // Load the first question
+            loadQuestion();
+        }
+        
+        // Load the current question
+        function loadQuestion() {
+            const question = questions[currentQuestionIndex];
+            currentQuestionSpan.textContent = currentQuestionIndex + 1;
+            
+            // Update question text
+            questionElement.textContent = question.question;
+            
+            // Clear previous options
+            optionsElement.innerHTML = '';
+            
+            // Add new options
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                if (selectedAnswers[currentQuestionIndex] === index) {
+                    optionElement.classList.add('selected');
+                }
+                
+                optionElement.innerHTML = `
+                    <div class="option-prefix">${String.fromCharCode(65 + index)}</div>
+                    <div class="option-text">${option}</div>
+                `;
+                
+                optionElement.addEventListener('click', () => selectOption(index));
+                optionsElement.appendChild(optionElement);
+            });
+            
+            // Update button text based on question
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.textContent = 'Finish Quiz';
+            } else {
+                nextBtn.textContent = 'Next Question';
+            }
+        }
+        
+        // Select an option
+        function selectOption(optionIndex) {
+            selectedAnswers[currentQuestionIndex] = optionIndex;
+            
+            // Update UI to show selected option
+            const options = optionsElement.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === optionIndex) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+        }
+        
+        // Go to next question or finish quiz
+        function goToNextQuestion() {
+            // Check if an option is selected
+            if (selectedAnswers[currentQuestionIndex] === null) {
+                alert('Please select an answer before proceeding.');
+                return;
+            }
+            
+            // Check if current answer is correct
+            if (selectedAnswers[currentQuestionIndex] === questions[currentQuestionIndex].answer) {
+                score++;
+            }
+            
+            // Go to next question or finish
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+        
+        // Finish quiz and show results
+        function finishQuiz() {
+            // Calculate score
+            const percentage = (score / questions.length) * 100;
+            
+            // Update results UI
+            resultsTopic.textContent = getTopicName(currentTopic) + " Quiz";
+            scoreElement.textContent = `${score}/${questions.length}`;
+            scoreTextElement.textContent = `You scored ${percentage}%`;
+            
+            // Show results
+            quizContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+        }
+        
+        // Show topic selector
+        function showTopicSelector() {
+            topicSelector.style.display = 'block';
+            quizContainer.style.display = 'none';
+            resultsContainer.style.display = 'none';
+        }
+        
+        // Get random questions from a question bank
+        function getRandomQuestions(bank, count) {
+            const shuffled = [...bank].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+        
+        // Get topic name from topic code
+        function getTopicName(topic) {
+            switch(topic) {
+                case 'financial': return 'Financial Accounting';
+                case 'management': return 'Management Accounting';
+                case 'auditing': return 'Auditing';
+                default: return '';
+            }
+        }
+         // Show PRO tooltip
+        function showProTooltip(event) {
+            proTooltip.style.left = `${event.pageX}px`;
+            proTooltip.style.top = `${event.pageY - 40}px`;
+            proTooltip.style.opacity = '1';
+            
+            setTimeout(() => {
+                proTooltip.style.opacity = '0';
+            }, 2000);
+        }
+        
+        // Initialize on load
+        window.addEventListener('load', init);
+    </script>
 </body>
 </html>
